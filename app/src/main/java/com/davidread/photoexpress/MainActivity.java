@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Create a content URI to grant camera app write permission to mPhotoFile.
         Uri photoUri = FileProvider.getUriForFile(this,
-                "com.zybooks.photoexpress.fileprovider", mPhotoFile);
+                "com.davidread.photoexpress.fileprovider", mPhotoFile);
 
         // Start camera app.
         mTakePicture.launch(photoUri);

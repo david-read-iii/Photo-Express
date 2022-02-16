@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -194,7 +195,25 @@ public class MainActivity extends AppCompatActivity {
         mPhotoImageView.setColorFilter(colorFilter);
     }
 
+    /**
+     * Invoked when the "Save" {@link Button} is clicked. It creates a new {@link ImageSaver} to
+     * overwrite the photo at {@link #mPhotoFile} with a brightness-altered version.
+     */
     public void savePhotoClick(View view) {
-        // TODO: Save the altered photo
+
+        // Don't allow Save button to be pressed while image is saving.
+        mSaveButton.setEnabled(false);
+
+        // Save image in background thread.
+        ImageSaver imageSaver = new ImageSaver(this);
+        imageSaver.saveAlteredPhotoAsync(mPhotoFile, mMultColor, mAddColor, result -> {
+
+            // Show appropriate message.
+            int message = result ? R.string.photo_saved : R.string.photo_not_saved;
+            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+
+            // Allow Save button to be clicked again.
+            mSaveButton.setEnabled(true);
+        });
     }
 }

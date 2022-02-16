@@ -7,6 +7,8 @@ import androidx.core.content.FileProvider;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.LightingColorFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -47,19 +49,17 @@ public class MainActivity extends AppCompatActivity {
     private Button mSaveButton;
 
     /**
-     * TODO: Document when {@link #changeBrightness(int)} is implemented
+     * Int color value to multiply against RGB values when changing the image's brightness.
      */
     private int mMultColor = 0xffffffff;
 
     /**
-     * TODO: Document when {@link #changeBrightness(int)} is implemented
+     * Int color value to add to RGB values when changing the image's brightness.
      */
     private int mAddColor = 0;
 
     /**
      * Invoked once when this activity is created. It initializes member variables.
-     *
-     * @param savedInstanceState
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,8 +167,31 @@ public class MainActivity extends AppCompatActivity {
         mPhotoImageView.setImageBitmap(bitmap);
     }
 
+    /**
+     * Alters the thumbnail image preview in {@link #mPhotoImageView} with the passed brightness
+     * value. It saves the alteration values used to {@link #mAddColor} and {@link #mMultColor}.
+     *
+     * @param brightness An int between 0 and 99 to make the image darker. An int between 101 and
+     *                   200 to make the image lighter.
+     */
     private void changeBrightness(int brightness) {
-        // TODO: Change brightness
+        // 100 is the middle value.
+        if (brightness > 100) {
+            // Add color.
+            float addMult = brightness / 100.0f - 1;
+            mAddColor = Color.argb(255, (int) (255 * addMult), (int) (255 * addMult),
+                    (int) (255 * addMult));
+            mMultColor = 0xffffffff;
+        } else {
+            // Scale color down.
+            float brightMult = brightness / 100.0f;
+            mMultColor = Color.argb(255, (int) (255 * brightMult), (int) (255 * brightMult),
+                    (int) (255 * brightMult));
+            mAddColor = 0;
+        }
+
+        LightingColorFilter colorFilter = new LightingColorFilter(mMultColor, mAddColor);
+        mPhotoImageView.setColorFilter(colorFilter);
     }
 
     public void savePhotoClick(View view) {
